@@ -1,28 +1,31 @@
-﻿using Meowv.Blog.Application.Contracts.Blog;
-using Meowv.Blog.Domain.Blog;
-using Meowv.Blog.ToolKits.Base;
+﻿using Meowv.Blog.Domain.Blog;
+using Meowv.Blog.Dto.Blog;
+using Meowv.Blog.Response;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Meowv.Blog.Application.Blog.Impl
+namespace Meowv.Blog.Blog.Impl
 {
     public partial class BlogService
     {
         /// <summary>
-        /// 查询友链列表
+        /// Get the list of friendlinks.
         /// </summary>
         /// <returns></returns>
-        public async Task<ServiceResult<IEnumerable<FriendLinkDto>>> QueryFriendLinksAsync()
+        [Route("api/meowv/blog/friendlinks")]
+        public async Task<BlogResponse<List<FriendLinkDto>>> GetFriendLinksAsync()
         {
-            return await _blogCacheService.QueryFriendLinksAsync(async () =>
+            return await _cache.GetFriendLinksAsync(async () =>
             {
-                var result = new ServiceResult<IEnumerable<FriendLinkDto>>();
+                var response = new BlogResponse<List<FriendLinkDto>>();
 
-                var friendLinks = await _friendLinksRepository.GetListAsync();
-                var list = ObjectMapper.Map<IEnumerable<FriendLink>, IEnumerable<FriendLinkDto>>(friendLinks);
+                var friendLinks = await _friendLinks.GetListAsync();
 
-                result.IsSuccess(list);
-                return result;
+                var result = ObjectMapper.Map<List<FriendLink>, List<FriendLinkDto>>(friendLinks);
+
+                response.Result = result;
+                return response;
             });
         }
     }

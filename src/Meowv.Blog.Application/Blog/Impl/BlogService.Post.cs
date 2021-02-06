@@ -1,184 +1,136 @@
-﻿using Meowv.Blog.Application.Contracts;
-using Meowv.Blog.Application.Contracts.Blog;
-using Meowv.Blog.ToolKits.Base;
-using Meowv.Blog.ToolKits.Extensions;
+﻿using Meowv.Blog.Domain.Blog;
+using Meowv.Blog.Dto.Blog;
+using Meowv.Blog.Response;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using static Meowv.Blog.Domain.Shared.MeowvBlogConsts;
 
-namespace Meowv.Blog.Application.Blog.Impl
+namespace Meowv.Blog.Blog.Impl
 {
     public partial class BlogService
     {
         /// <summary>
-        /// 根据URL获取文章详情
+        /// Get post by url.
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        public async Task<ServiceResult<PostDetailDto>> GetPostDetailAsync(string url)
+        [Route("api/meowv/blog/post")]
+        public async Task<BlogResponse<PostDetailDto>> GetPostByUrlAsync(string url)
         {
-            return await _blogCacheService.GetPostDetailAsync(url, async () =>
+            return await _cache.GetPostByUrlAsync(url, async () =>
             {
-                var result = new ServiceResult<PostDetailDto>();
+                var response = new BlogResponse<PostDetailDto>();
 
-                var post = await _postRepository.FindAsync(x => x.Url.Equals(url));
-
-                if (null == post)
+                var post = await _posts.FindAsync(x => x.Url == url);
+                if (post is null)
                 {
-                    result.IsFailed(ResponseText.WHAT_NOT_EXIST.FormatWith("URL", url));
-                    return result;
+                    response.IsFailed($"The post url not exists.");
+                    return response;
                 }
 
-                var category = await _categoryRepository.GetAsync(post.CategoryId);
-
-                var tags = from post_tags in await _postTagRepository.GetListAsync()
-                           join tag in await _tagRepository.GetListAsync()
-                           on post_tags.TagId equals tag.Id
-                           where post_tags.PostId.Equals(post.Id)
-                           select new TagDto
-                           {
-                               TagName = tag.TagName,
-                               DisplayName = tag.DisplayName
-                           };
-
-                var previous = _postRepository.Where(x => x.CreationTime > post.CreationTime).Take(1).FirstOrDefault();
-                var next = _postRepository.Where(x => x.CreationTime < post.CreationTime).OrderByDescending(x => x.CreationTime).Take(1).FirstOrDefault();
-
-                var postDetail = new PostDetailDto
+                var previous = _posts.Where(x => x.CreatedAt > post.CreatedAt).Take(1).Select(x => new PostPagedDto
                 {
-                    Title = post.Title,
-                    Author = post.Author,
-                    Url = post.Url,
-                    Html = post.Html,
-                    Markdown = post.Markdown,
-                    CreationTime = post.CreationTime.TryToDateTime(),
-                    Category = new CategoryDto
-                    {
-                        CategoryName = category.CategoryName,
-                        DisplayName = category.DisplayName
-                    },
-                    Tags = tags,
-                    Previous = previous == null ? null : new PostForPagedDto
-                    {
-                        Title = previous.Title,
-                        Url = previous.Url
-                    },
-                    Next = next == null ? null : new PostForPagedDto
-                    {
-                        Title = next.Title,
-                        Url = next.Url
-                    }
-                };
+                    Title = x.Title,
+                    Url = x.Url
+                }).FirstOrDefault();
+                var next = _posts.Where(x => x.CreatedAt < post.CreatedAt).OrderByDescending(x => x.CreatedAt).Take(1).Select(x => new PostPagedDto
+                {
+                    Title = x.Title,
+                    Url = x.Url
+                }).FirstOrDefault();
 
-                result.IsSuccess(postDetail);
-                return result;
+                var result = ObjectMapper.Map<Post, PostDetailDto>(post);
+                result.Previous = previous;
+                result.Next = next;
+
+                response.Result = result;
+                return response;
             });
         }
 
         /// <summary>
-        /// 分页查询文章列表
+        /// Get the list of posts by paging.
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="page"></param>
+        /// <param name="limit"></param>
         /// <returns></returns>
-        public async Task<ServiceResult<PagedList<QueryPostDto>>> QueryPostsAsync(PagingInput input)
+        [Route("api/meowv/blog/posts/{page}/{limit}")]
+        public async Task<BlogResponse<PagedList<GetPostDto>>> GetPostsAsync([Range(1, 100)] int page = 1, [Range(10, 100)] int limit = 10)
         {
-            return await _blogCacheService.QueryPostsAsync(input, async () =>
+            return await _cache.GetPostsAsync(page, limit, async () =>
             {
-                var result = new ServiceResult<PagedList<QueryPostDto>>();
+                var response = new BlogResponse<PagedList<GetPostDto>>();
 
-                var count = await _postRepository.GetCountAsync();
+                var result = await _posts.GetPagedListAsync(page, limit);
+                var total = result.Item1;
+                var posts = GetPostList(result.Item2);
 
-                var list = _postRepository.OrderByDescending(x => x.CreationTime)
-                                          .PageByIndex(input.Page, input.Limit)
-                                          .Select(x => new PostBriefDto
-                                          {
-                                              Title = x.Title,
-                                              Url = x.Url,
-                                              Year = x.CreationTime.Year,
-                                              CreationTime = x.CreationTime.TryToDateTime()
-                                          }).GroupBy(x => x.Year)
-                                          .Select(x => new QueryPostDto
-                                          {
-                                              Year = x.Key,
-                                              Posts = x.ToList()
-                                          }).ToList();
-
-                result.IsSuccess(new PagedList<QueryPostDto>(count.TryToInt(), list));
-                return result;
+                response.Result = new PagedList<GetPostDto>(total, posts);
+                return response;
             });
         }
 
         /// <summary>
-        /// 通过分类名称查询文章列表
+        /// Get the list of posts by category.
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="category"></param>
         /// <returns></returns>
-        public async Task<ServiceResult<IEnumerable<QueryPostDto>>> QueryPostsByCategoryAsync(string name)
+        [Route("api/meowv/blog/posts/category/{category}")]
+        public async Task<BlogResponse<List<GetPostDto>>> GetPostsByCategoryAsync(string category)
         {
-            return await _blogCacheService.QueryPostsByCategoryAsync(name, async () =>
+            return await _cache.GetPostsByCategoryAsync(category, async () =>
             {
-                var result = new ServiceResult<IEnumerable<QueryPostDto>>();
+                var response = new BlogResponse<List<GetPostDto>>();
 
-                var list = (from posts in await _postRepository.GetListAsync()
-                            join categories in await _categoryRepository.GetListAsync()
-                            on posts.CategoryId equals categories.Id
-                            where categories.DisplayName.Equals(name)
-                            orderby posts.CreationTime descending
-                            select new PostBriefDto
-                            {
-                                Title = posts.Title,
-                                Url = posts.Url,
-                                Year = posts.CreationTime.Year,
-                                CreationTime = posts.CreationTime.TryToDateTime()
-                            })
-                           .GroupBy(x => x.Year)
-                           .Select(x => new QueryPostDto
-                           {
-                               Year = x.Key,
-                               Posts = x.ToList()
-                           });
+                var entity = await _categories.FindAsync(x => x.Alias == category);
+                if (entity is null)
+                {
+                    response.IsFailed($"The category:{category} not exists.");
+                    return response;
+                }
 
-                result.IsSuccess(list);
-                return result;
+                var posts = await _posts.GetListByCategoryAsync(category);
+
+                response.IsSuccess(GetPostList(posts), entity.Name);
+                return response;
             });
         }
 
         /// <summary>
-        /// 通过标签名称查询文章列表
+        /// Get the list of posts by tag.
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="tag"></param>
         /// <returns></returns>
-        public async Task<ServiceResult<IEnumerable<QueryPostDto>>> QueryPostsByTagAsync(string name)
+        [Route("api/meowv/blog/posts/tag/{tag}")]
+        public async Task<BlogResponse<List<GetPostDto>>> GetPostsByTagAsync(string tag)
         {
-            return await _blogCacheService.QueryPostsByTagAsync(name, async () =>
+            return await _cache.GetPostsByTagAsync(tag, async () =>
             {
-                var result = new ServiceResult<IEnumerable<QueryPostDto>>();
+                var response = new BlogResponse<List<GetPostDto>>();
 
-                var list = (from post_tags in await _postTagRepository.GetListAsync()
-                            join tags in await _tagRepository.GetListAsync()
-                            on post_tags.TagId equals tags.Id
-                            join posts in await _postRepository.GetListAsync()
-                            on post_tags.PostId equals posts.Id
-                            where tags.DisplayName.Equals(name)
-                            orderby posts.CreationTime descending
-                            select new PostBriefDto
-                            {
-                                Title = posts.Title,
-                                Url = posts.Url,
-                                Year = posts.CreationTime.Year,
-                                CreationTime = posts.CreationTime.TryToDateTime()
-                            })
-                            .GroupBy(x => x.Year)
-                            .Select(x => new QueryPostDto
-                            {
-                                Year = x.Key,
-                                Posts = x.ToList()
-                            });
+                var entity = await _tags.FindAsync(x => x.Alias == tag);
+                if (entity is null)
+                {
+                    response.IsFailed($"The tag:{tag} not exists.");
+                    return response;
+                }
 
-                result.IsSuccess(list);
-                return result;
+                var posts = await _posts.GetListByTagAsync(tag);
+
+                response.IsSuccess(GetPostList(posts), entity.Name);
+                return response;
             });
         }
+
+        private List<GetPostDto> GetPostList(List<Post> posts) =>
+            ObjectMapper.Map<List<Post>, List<PostBriefDto>>(posts)
+                        .GroupBy(x => x.Year)
+                        .Select(x => new GetPostDto
+                        {
+                            Year = x.Key,
+                            Posts = x
+                        }).ToList();
     }
 }

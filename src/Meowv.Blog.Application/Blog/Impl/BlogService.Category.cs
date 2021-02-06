@@ -1,65 +1,36 @@
-﻿using Meowv.Blog.Application.Contracts.Blog;
-using Meowv.Blog.ToolKits.Base;
-using Meowv.Blog.ToolKits.Extensions;
+﻿using Meowv.Blog.Dto.Blog;
+using Meowv.Blog.Response;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static Meowv.Blog.Domain.Shared.MeowvBlogConsts;
 
-namespace Meowv.Blog.Application.Blog.Impl
+namespace Meowv.Blog.Blog.Impl
 {
     public partial class BlogService
     {
         /// <summary>
-        /// 获取分类名称
+        /// Get the list of categories.
         /// </summary>
-        /// <param name="name"></param>
         /// <returns></returns>
-        public async Task<ServiceResult<string>> GetCategoryAsync(string name)
+        [Route("api/meowv/blog/categories")]
+        public async Task<BlogResponse<List<GetCategoryDto>>> GetCategoriesAsync()
         {
-            return await _blogCacheService.GetCategoryAsync(name, async () =>
+            return await _cache.GetCategoriesAsync(async () =>
             {
-                var result = new ServiceResult<string>();
+                var response = new BlogResponse<List<GetCategoryDto>>();
 
-                var category = await _categoryRepository.FindAsync(x => x.DisplayName.Equals(name));
-                if (null == category)
+                var categories = await _categories.GetListAsync();
+
+                var result = categories.Select(x => new GetCategoryDto
                 {
-                    result.IsFailed(ResponseText.WHAT_NOT_EXIST.FormatWith("分类", name));
-                    return result;
-                }
+                    Name = x.Name,
+                    Alias = x.Alias,
+                    Total = _posts.GetCountByCategoryAsync(x.Id).Result
+                }).Where(x => x.Total > 0).ToList();
 
-                result.IsSuccess(category.CategoryName);
-                return result;
-            });
-        }
-
-        /// <summary>
-        /// 查询分类列表
-        /// </summary>
-        /// <returns></returns>
-        public async Task<ServiceResult<IEnumerable<QueryCategoryDto>>> QueryCategoriesAsync()
-        {
-            return await _blogCacheService.QueryCategoriesAsync(async () =>
-            {
-                var result = new ServiceResult<IEnumerable<QueryCategoryDto>>();
-
-                var list = from category in await _categoryRepository.GetListAsync()
-                           join posts in await _postRepository.GetListAsync()
-                           on category.Id equals posts.CategoryId
-                           group category by new
-                           {
-                               category.CategoryName,
-                               category.DisplayName
-                           } into g
-                           select new QueryCategoryDto
-                           {
-                               CategoryName = g.Key.CategoryName,
-                               DisplayName = g.Key.DisplayName,
-                               Count = g.Count()
-                           };
-
-                result.IsSuccess(list);
-                return result;
+                response.Result = result;
+                return response;
             });
         }
     }

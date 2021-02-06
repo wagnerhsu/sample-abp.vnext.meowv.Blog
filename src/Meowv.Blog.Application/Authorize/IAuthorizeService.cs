@@ -1,35 +1,20 @@
-﻿using Meowv.Blog.ToolKits.Base;
+﻿using Meowv.Blog.Dto.Authorize.Params;
+using Meowv.Blog.Response;
+using Meowv.Blog.Users;
 using System.Threading.Tasks;
 
-namespace Meowv.Blog.Application.Authorize
+namespace Meowv.Blog.Authorize
 {
     public interface IAuthorizeService
     {
-        /// <summary>
-        /// 获取登录地址(GitHub)
-        /// </summary>
-        /// <returns></returns>
-        Task<ServiceResult<string>> GetLoginAddressAsync();
+        Task<BlogResponse<string>> GetAuthorizeUrlAsync(string type);
 
-        /// <summary>
-        /// 获取AccessToken
-        /// </summary>
-        /// <param name="code"></param>
-        /// <returns></returns>
-        Task<ServiceResult<string>> GetAccessTokenAsync(string code);
+        Task<BlogResponse<string>> GenerateTokenAsync(string type, string code, string state);
 
-        /// <summary>
-        /// 登录成功，生成Token
-        /// </summary>
-        /// <param name="access_token"></param>
-        /// <returns></returns>
-        Task<ServiceResult<string>> GenerateTokenAsync(string access_token);
+        Task<BlogResponse<string>> GenerateTokenAsync(string code);
 
-        /// <summary>
-        /// 验证Token是否合法
-        /// </summary>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        Task<ServiceResult> VerifyToken(string token);
+        Task<BlogResponse<string>> GenerateTokenAsync(IUserService userService, AccountInput input);
+
+        Task<BlogResponse> SendAuthorizeCodeAsync();
     }
 }

@@ -1,18 +1,54 @@
-# 🤣阿星Plus⭐⭐⭐
+# 🤣阿星Plus⭐⭐⭐ 个人博客
 
 ## 项目介绍
 
-此版本个人博客项目底层基于 [abp vNext](http://abp.io/) (不完全依赖)搭建，和免费开源跨平台的 .NET Core 3.1 开发，支持各种主流数据库(SqlServer、MySQL、PostgreSql、Sqlite)一键切换，遵循 RESTful 接口规范，前端使用 Blazor 开发，可作为 .NET Core 入门项目进行学习。
+本项目有不同开发版本，最新版底层基于 [abp vNext](http://abp.io) 搭建和免费开源跨平台框架 [.NET5](https://dot.net) 进行开发，使用 MongoDB 存储数据，Redis 缓存数据。项目采用前后端分离的模式进行开发，API 遵循 RESTful 接口规范，页面使用 [Blazor](http://blazor.net) 进行开发，可作为 .NET Core 入门项目进行学习。
+
+**注：历史版本，请切换不同分支查看。**
 
 If you liked `Blog` project or if it helped you, please give a star ⭐️ for this repository. 👍👍👍
 
-## 微信公众号
+```tree
+blog
+ ├── assets ---------- assets
+ ├── LICENSE ---------- LICENSE
+ ├── meowv.blog.sln ---------- Solution
+ ├── README.md ---------- README.md
+ └── src
+     ├── Meowv.Blog.Admin ---------- Admin项目 admin.meowv.com
+     ├── Meowv.Blog.Api ---------- Api项目 api.meowv.com
+     ├── Meowv.Blog.Application ---------- Application
+     ├── Meowv.Blog.BackgroundWorkers ---------- BackgroundWorkers
+     ├── Meowv.Blog.Core ---------- Core
+     ├── Meowv.Blog.DbMigrator ---------- DbMigrator
+     ├── Meowv.Blog.MongoDb ---------- MongoDb
+     ├── Meowv.Blog.Response ---------- Response
+     └── Meowv.Blog.Web ---------- Web项目 meowv.com
+```
 
-欢迎关注微信公众号：阿星Plus
+## 预览体验
 
-![微信公众号：阿星Plus](static/qrcode.jpg)
+### Web项目：[https://meowv.com](https://meowv.com)
 
-## 系列文章
+![web_light](assets/web_light.png)
+
+![web_dark](assets/web_dark.png)
+
+### Admin项目：[https://admin.meowv.com](https://admin.meowv.com)
+
+![admin_login](assets/admin_login.png)
+
+![admin_light](assets/admin_light.png)
+
+![admin_dark](assets/admin_dark.png)
+
+### Api项目：[https://api.meowv.com](https://api.meowv.com)
+
+![api](assets/api.png)
+
+## [文章介绍](https://docs.meowv.com/aspnetcore/abp-blog/)
+
+### v3.4.0
 
 1. **[使用 abp cli 搭建项目](https://mp.weixin.qq.com/s/3Sc4Z2xkLdQNErvXf92B9A)**
 2. **[给项目瘦身，让它跑起来](https://mp.weixin.qq.com/s/oc96GG2sxz0J_vT6sReojQ)**
@@ -45,55 +81,9 @@ If you liked `Blog` project or if it helped you, please give a star ⭐️ for t
 29. **[Blazor 实战系列（九）](https://mp.weixin.qq.com/s/0-mMmkr3HelmoJUWN7R7JA)**
 30. **[终结篇之发布项目](https://mp.weixin.qq.com/s/Lf543XOxSIGYdOGM8Zt4Lw)**
 
-```tree
-Blog ---------- root
- ├── .dockerignore ---------- docker ignore
- ├── .gitattributes ---------- git attributes
- ├── .gitignore ---------- git ignore
- ├── common.props ---------- common.props
- ├── Dockerfile ---------- Dockerfile
- ├── LICENSE ---------- LICENSE
- ├── Meowv.Blog.sln ---------- Solution
- ├── README.md ---------- README.md
- ├── src
- │   ├── Meowv.Blog.Application ---------- Application
- │   ├── Meowv.Blog.Application.Caching ---------- Application.Caching
- │   ├── Meowv.Blog.Application.Contracts ---------- Application.Contracts
- │   ├── Meowv.Blog.BackgroundJobs ---------- BackgroundJobs
- │   ├── Meowv.Blog.BlazorApp ---------- Blazor App
- │   ├── Meowv.Blog.Domain ---------- Domain
- │   ├── Meowv.Blog.Domain.Shared ---------- Domain.Shared
- │   ├── Meowv.Blog.EntityFrameworkCore ---------- EntityFrameworkCore
- │   ├── Meowv.Blog.EntityFrameworkCore.DbMigrations ---------- EntityFrameworkCore.DbMigrations
- │   ├── Meowv.Blog.HttpApi ---------- HttpApi
- │   ├── Meowv.Blog.HttpApi.Hosting ---------- HttpApi.Hosting
- │   ├── Meowv.Blog.Swagger ---------- Swagger
- │   └── Meowv.Blog.ToolKits ---------- ToolKits
- └── static ---------- static
-```
+### v4.0.0
 
-## 技术栈
-
-abp vNext + .NET Core 3.1 + Blazor + JWT + Redis + Hangfire + Mysql + SqlServer + Sqlite + PostgreSql + WebApi + EF Core + Swagger + HtmlAgilityPack + PuppeteerSharp + log4net + MailKit + Docker + Nginx + ...
-
-## 预览
-
-### Blog：[https://meowv.com](https://meowv.com)
-
-![white](static/white.jpg)
-![black](static/black.jpg)
-
-### API：[https://api.meowv.com](https://api.meowv.com)
-
-![api](static/api.jpg)
-
-### Hangfire：[https://api.meowv.com/hangfire](https://api.meowv.com/hangfire)
-
-![hangfire](static/hangfire.jpg)
-
-## Donate
-
-![Donate](static/donate.jpg)
+TODO...
 
 ## LICENSE
 

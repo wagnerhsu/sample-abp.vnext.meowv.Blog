@@ -19,8 +19,6 @@ namespace Meowv.Blog.Domain.Hots
         {
             public const string cnblogs = "博客园";
 
-            public const string v2ex = "V2EX";
-
             public const string segmentfault = "思否";
 
             public const string weixin = "微信热门";
@@ -65,22 +63,17 @@ namespace Meowv.Blog.Domain.Hots
 
             public const string tianya = "天涯";
 
-            public const string lssdjt = "历史上的今天";
-
             public const string bilibili = "哔哩哔哩";
 
             public const string douyin = "抖音";
 
             public const string kaiyan = "开眼视频";
 
-            public const string gaoloumi = "高楼迷";
-
             public const string github = "GitHub";
 
             public static Dictionary<string, string> Dictionary { get; set; } = new Dictionary<string, string>
             {
                 { cnblogs, "https://www.cnblogs.com" },
-                { v2ex, "https://www.v2ex.com/api/topics/hot.json" },
                 { segmentfault, "https://segmentfault.com/hottest" },
                 { weixin, "https://weixin.sogou.com" },
                 { douban, "https://www.douban.com/group/explore" },
@@ -91,7 +84,7 @@ namespace Meowv.Blog.Domain.Hots
                 { tieba, "http://tieba.baidu.com/hottopic/browse/topicList?res_type=1" },
                 { weibo, "https://s.weibo.com/top/summary/summary" },
                 { juejin, "https://api.juejin.cn/recommend_api/v1/article/recommend_all_feed" },
-                { csdn, "https://blog.csdn.net/phoenix/web/blog/hotRank?pageSize=100" },
+                { csdn, "https://blog.csdn.net/phoenix/web/blog/hotRank?pageSize=50" },
                 { toutiao, "https://toutiao.io" },
                 { imooc, "https://www.imooc.com/article/excellent?type=3" },
                 { zhihu, "https://www.zhihu.com/api/v3/feed/topstory/hot-lists/total?limit=50" },
@@ -103,11 +96,9 @@ namespace Meowv.Blog.Domain.Hots
                 { jandan, "http://jandan.net/top" },
                 { pojie52, "https://www.52pojie.cn/misc.php?mod=ranklist&type=thread&view=heats&orderby=today" },
                 { tianya, "http://bbs.tianya.cn/list.jsp?item=free&grade=3&order=1" },
-                { lssdjt, "http://m.lssdjt.com" },
                 { bilibili, "https://www.bilibili.com/v/popular/rank/all" },
                 { douyin, "https://www.iesdouyin.com/web/api/v2/hotsearch/billboard/aweme" },
                 { kaiyan, "https://baobab.kaiyanapp.com/api/v1/feed?udid=3e7ee30c6fc0004a773dc33b0597b5732b145c04" },
-                { gaoloumi, "http://gaoloumi.cc/misc.php?mod=ranklist&type=thread&view=heats&orderby=today" },
                 { github, "https://github.com/trending/c%23?since=daily" }
             };
         }

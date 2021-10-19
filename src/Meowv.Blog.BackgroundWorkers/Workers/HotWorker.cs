@@ -71,7 +71,7 @@ namespace Meowv.Blog.Workers
                     {
                         switch (source)
                         {
-                            case Hot.KnownSources.v2ex or Hot.KnownSources.juejin or Hot.KnownSources.csdn or Hot.KnownSources.zhihu or Hot.KnownSources.huxiu or Hot.KnownSources.douyin or Hot.KnownSources.woshipm or Hot.KnownSources.kaiyan:
+                            case Hot.KnownSources.juejin or Hot.KnownSources.csdn or Hot.KnownSources.zhihu or Hot.KnownSources.huxiu or Hot.KnownSources.douyin or Hot.KnownSources.woshipm or Hot.KnownSources.kaiyan:
                                 {
                                     using var client = _httpClient.CreateClient();
                                     client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36 Edg/87.0.664.66");
@@ -97,7 +97,7 @@ namespace Meowv.Blog.Workers
 
                             default:
                                 {
-                                    var encoding = source is Hot.KnownSources.baidu or Hot.KnownSources.news163 or Hot.KnownSources.pojie52 or Hot.KnownSources.gaoloumi ? Encoding.GetEncoding("GB2312") : Encoding.UTF8;
+                                    var encoding = source is Hot.KnownSources.baidu or Hot.KnownSources.news163 or Hot.KnownSources.pojie52 ? Encoding.GetEncoding("GB2312") : Encoding.UTF8;
                                     result = await web.LoadFromWebAsync(url, encoding);
                                     break;
                                 }
@@ -156,24 +156,6 @@ namespace Meowv.Blog.Workers
                                     Url = x.GetAttributeValue("href", string.Empty)
                                 });
                             });
-
-                            await SaveAsync();
-                            break;
-                        }
-
-                    case Hot.KnownSources.v2ex:
-                        {
-                            var json = result as string;
-                            var nodes = JArray.Parse(json);
-
-                            foreach (var node in nodes)
-                            {
-                                hot.Datas.Add(new Data
-                                {
-                                    Title = node["title"].ToString(),
-                                    Url = node["url"].ToString()
-                                });
-                            }
 
                             await SaveAsync();
                             break;
@@ -254,7 +236,7 @@ namespace Meowv.Blog.Workers
                     case Hot.KnownSources.oschina:
                         {
                             var html = result as HtmlDocument;
-                            var nodes = html.DocumentNode.SelectNodes("//div[@class='ui items']/div/div/a").ToList();
+                            var nodes = html.DocumentNode.SelectNodes("//div[@class='ui items']/div/div[@class='content']/a").ToList();
 
                             nodes.ForEach(x =>
                             {
@@ -591,24 +573,6 @@ namespace Meowv.Blog.Workers
                             break;
                         }
 
-                    case Hot.KnownSources.lssdjt:
-                        {
-                            var html = result as HtmlDocument;
-                            var nodes = html.DocumentNode.SelectNodes("//div[@class='list']/li/a").ToList();
-
-                            nodes.ForEach(x =>
-                            {
-                                hot.Datas.Add(new Data
-                                {
-                                    Title = x.InnerText,
-                                    Url = $"http://m.lssdjt.com{x.GetAttributeValue("href", "")}"
-                                });
-                            });
-
-                            await SaveAsync();
-                            break;
-                        }
-
                     case Hot.KnownSources.bilibili:
                         {
                             var html = result as HtmlDocument;
@@ -658,24 +622,6 @@ namespace Meowv.Blog.Workers
                                     Url = $"https://www.kaiyanapp.com/detail.html?vid={node["id"]}"
                                 });
                             }
-
-                            await SaveAsync();
-                            break;
-                        }
-
-                    case Hot.KnownSources.gaoloumi:
-                        {
-                            var html = result as HtmlDocument;
-                            var nodes = html.DocumentNode.SelectNodes("//div[@class='tl']/table/tr/th/a").ToList();
-
-                            nodes.ForEach(x =>
-                            {
-                                hot.Datas.Add(new Data
-                                {
-                                    Title = x.InnerText,
-                                    Url = $"http://gaoloumi.cc/{x.GetAttributeValue("href", "").Replace("amp;", "")}"
-                                });
-                            });
 
                             await SaveAsync();
                             break;

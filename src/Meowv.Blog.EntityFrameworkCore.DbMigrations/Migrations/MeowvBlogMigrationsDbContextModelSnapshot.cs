@@ -16,7 +16,7 @@ namespace Meowv.Blog.EntityFrameworkCore.DbMigrations.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("_Abp_DatabaseProvider", EfCoreDatabaseProvider.Sqlite)
-                .HasAnnotation("ProductVersion", "3.1.4");
+                .HasAnnotation("ProductVersion", "3.1.8");
 
             modelBuilder.Entity("Meowv.Blog.Domain.Blog.Category", b =>
                 {
@@ -260,9 +260,9 @@ namespace Meowv.Blog.EntityFrameworkCore.DbMigrations.Migrations
 
             modelBuilder.Entity("Meowv.Blog.Domain.Soul.ChickenSoup", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Content")
                         .IsRequired()

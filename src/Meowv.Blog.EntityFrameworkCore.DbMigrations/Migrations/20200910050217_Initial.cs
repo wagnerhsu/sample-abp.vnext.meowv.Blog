@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
-using System;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Meowv.Blog.EntityFrameworkCore.DbMigrations.Migrations
 {
-    public partial class Initialization : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -41,7 +41,8 @@ namespace Meowv.Blog.EntityFrameworkCore.DbMigrations.Migrations
                 name: "meowv_ChickenSoups",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(nullable: false),
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
                     Content = table.Column<string>(maxLength: 200, nullable: false)
                 },
                 constraints: table =>

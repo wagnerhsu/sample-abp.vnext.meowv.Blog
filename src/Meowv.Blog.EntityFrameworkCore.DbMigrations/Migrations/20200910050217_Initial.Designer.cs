@@ -10,15 +10,15 @@ using Volo.Abp.EntityFrameworkCore;
 namespace Meowv.Blog.EntityFrameworkCore.DbMigrations.Migrations
 {
     [DbContext(typeof(MeowvBlogMigrationsDbContext))]
-    [Migration("20200616080844_Initialization")]
-    partial class Initialization
+    [Migration("20200910050217_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("_Abp_DatabaseProvider", EfCoreDatabaseProvider.Sqlite)
-                .HasAnnotation("ProductVersion", "3.1.4");
+                .HasAnnotation("ProductVersion", "3.1.8");
 
             modelBuilder.Entity("Meowv.Blog.Domain.Blog.Category", b =>
                 {
@@ -262,9 +262,9 @@ namespace Meowv.Blog.EntityFrameworkCore.DbMigrations.Migrations
 
             modelBuilder.Entity("Meowv.Blog.Domain.Soul.ChickenSoup", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Content")
                         .IsRequired()

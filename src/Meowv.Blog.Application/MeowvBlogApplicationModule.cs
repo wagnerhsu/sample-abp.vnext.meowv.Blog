@@ -1,14 +1,13 @@
-﻿using Meowv.Blog.Application.Caching;
+﻿using Volo.Abp.Application;
 using Volo.Abp.AutoMapper;
-using Volo.Abp.Identity;
 using Volo.Abp.Modularity;
 
-namespace Meowv.Blog.Application
+namespace Meowv.Blog
 {
     [DependsOn(
-        typeof(AbpIdentityApplicationModule),
+        typeof(AbpDddApplicationModule),
         typeof(AbpAutoMapperModule),
-        typeof(MeowvBlogApplicationCachingModule)
+        typeof(MeowvBlogCoreModule)
     )]
     public class MeowvBlogApplicationModule : AbpModule
     {
@@ -16,8 +15,8 @@ namespace Meowv.Blog.Application
         {
             Configure<AbpAutoMapperOptions>(options =>
             {
-                options.AddMaps<MeowvBlogApplicationModule>(validate: true);
-                options.AddProfile<MeowvBlogAutoMapperProfile>(validate: true);
+                options.AddMaps<MeowvBlogApplicationModule>();
+                options.AddProfile<MeowvBlogApplicationAutoMapperProfile>();
             });
         }
     }
